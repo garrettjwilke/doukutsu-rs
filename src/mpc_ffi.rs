@@ -107,11 +107,16 @@ pub struct CsRunner {
 impl CsRunner {
     fn new(data_dir: PathBuf, user_dir: PathBuf, samplerate: u32) -> GameResult<Self> {
         let _ = std::fs::create_dir_all(&user_dir);
-        std::env::set_var("CAVESTORY_DATA_DIR", &data_dir);
+        if !data_dir.as_os_str().is_empty() && data_dir.is_dir() {
+            std::env::set_var("CAVESTORY_DATA_DIR", &data_dir);
+        }
 
         let mut ctx = Box::pin(Context::new());
 
-        mount_vfs(&mut ctx, Box::new(PhysicalFS::new(&data_dir, true)));
+        if !data_dir.as_os_str().is_empty() && data_dir.is_dir() {
+            mount_vfs(&mut ctx, Box::new(PhysicalFS::new(&data_dir, true)));
+        }
+        mount_vfs(&mut ctx, Box::new(BuiltinFS::new_embedded_gamedata()));
         mount_user_vfs(&mut ctx, Box::new(PhysicalFS::new(&user_dir, false)));
         mount_vfs(&mut ctx, Box::new(BuiltinFS::new()));
 
@@ -378,10 +383,14 @@ pub unsafe extern "C" fn cs_runner_create(
     user_dir: *const c_char,
     samplerate: i32,
 ) -> *mut CsRunner {
-    if data_dir.is_null() || user_dir.is_null() {
+    if user_dir.is_null() {
         return std::ptr::null_mut();
     }
-    let data_path = PathBuf::from(CStr::from_ptr(data_dir).to_string_lossy().into_owned());
+    let data_path = if data_dir.is_null() {
+        PathBuf::new()
+    } else {
+        PathBuf::from(CStr::from_ptr(data_dir).to_string_lossy().into_owned())
+    };
     let user_path = PathBuf::from(CStr::from_ptr(user_dir).to_string_lossy().into_owned());
     let sr = if samplerate > 0 { samplerate as u32 } else { 44100 };
 

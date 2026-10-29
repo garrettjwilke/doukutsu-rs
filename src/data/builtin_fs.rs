@@ -93,7 +93,17 @@ pub struct BuiltinFS {
     root: Vec<FSNode>,
 }
 
+#[cfg(feature = "backend-mpc")]
+include!(concat!(env!("OUT_DIR"), "/embedded_gamedata.rs"));
+
 impl BuiltinFS {
+    #[cfg(feature = "backend-mpc")]
+    pub fn new_embedded_gamedata() -> Self {
+        Self {
+            root: embedded_gamedata_nodes(),
+        }
+    }
+
     pub fn new() -> Self {
         Self {
             root: vec![FSNode::Directory(
@@ -219,14 +229,14 @@ impl BuiltinFS {
 
                 for file in curr_dir {
                     match file {
-                        FSNode::File(name, _) if comp_name.eq(name) => {
+                        FSNode::File(name, _) if comp_name.eq_ignore_ascii_case(name) => {
                             return if iter.peek().is_some() {
                                 Err(FilesystemError(format!("Expected a directory, found a file: {:?}", path)))
                             } else {
                                 Ok(file.clone())
                             };
                         }
-                        FSNode::Directory(name, contents) if comp_name.eq(name) => {
+                        FSNode::Directory(name, contents) if comp_name.eq_ignore_ascii_case(name) => {
                             if iter.peek().is_some() {
                                 curr_dir = contents;
                                 break;
