@@ -51,9 +51,27 @@ impl VanillaExtractor {
 
         #[cfg(not(any(target_os = "android", target_os = "horizon")))]
         if !vanilla_exe_path.is_file() {
-            vanilla_exe_path = env::current_exe().unwrap();
-            vanilla_exe_path.pop();
-            vanilla_exe_path.push(&exe_name);
+            if let Ok(exe) = env::current_exe() {
+                vanilla_exe_path = exe;
+                vanilla_exe_path.pop();
+                vanilla_exe_path.push(&exe_name);
+            }
+        }
+
+        #[cfg(not(any(target_os = "android", target_os = "horizon")))]
+        if !vanilla_exe_path.is_file() {
+            if let Ok(data_dir) = env::var("CAVESTORY_DATA_DIR") {
+                let data_path = PathBuf::from(&data_dir);
+                let direct = data_path.join(&exe_name);
+                if direct.is_file() {
+                    vanilla_exe_path = direct;
+                } else if let Some(parent) = data_path.parent() {
+                    let parent_exe = parent.join(&exe_name);
+                    if parent_exe.is_file() {
+                        vanilla_exe_path = parent_exe;
+                    }
+                }
+            }
         }
 
         if !vanilla_exe_path.is_file() {

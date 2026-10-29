@@ -124,7 +124,7 @@ pub struct Game {
 }
 
 impl Game {
-    fn new(ctx: &mut Context) -> GameResult<Game> {
+    pub(crate) fn new(ctx: &mut Context) -> GameResult<Game> {
         let s = Game {
             scene: RefCell::new(None),
             ui: UI::new(ctx)?,

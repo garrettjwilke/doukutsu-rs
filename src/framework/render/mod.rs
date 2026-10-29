@@ -87,6 +87,7 @@ pub mod sprite_batch;
 pub mod vertex;
 
 pub mod null_impl;
+pub mod soft_impl;
 
 #[cfg(feature = "render-opengl")]
 pub mod opengl_impl;

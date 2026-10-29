@@ -25,6 +25,8 @@ mod macros;
 mod menu;
 mod mod_list;
 mod mod_requirements;
+#[cfg(feature = "backend-mpc")]
+pub mod mpc_ffi;
 mod scene;
 mod sound;
 mod util;

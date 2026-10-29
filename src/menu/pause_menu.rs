@@ -168,7 +168,7 @@ impl PauseMenu {
         state.sound_manager.play_sfx(5);
     }
 
-    pub fn is_paused(&mut self) -> bool {
+    pub fn is_paused(&self) -> bool {
         self.is_paused
     }
 

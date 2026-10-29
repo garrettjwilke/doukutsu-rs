@@ -10,7 +10,7 @@ edition = "2021"
 rust-version = "1.87"
 
 [lib]
-crate-type = ["lib"]
+crate-type = ["lib", "staticlib"]
 
 [[bin]]
 name = "doukutsu-rs"
@@ -46,11 +46,12 @@ minimum_system_version = "10.15"
 
 [features]
 default = ["default-base", "backend-sdl", "render-opengl", "exe", "webbrowser", "discord-rpc"]
-default-base = ["ogg-playback"]
+default-base = ["ogg-playback", "cpal"]
 ogg-playback = ["lewton"]
-backend-sdl = ["sdl2", "sdl2-sys"]
-backend-glutin = ["winit", "glutin", "render-opengl"]
+backend-sdl = ["sdl2", "sdl2-sys", "cpal"]
+backend-glutin = ["winit", "glutin", "render-opengl", "cpal"]
 backend-horizon = []
+backend-mpc = ["ogg-playback"]
 render-opengl = []
 discord-rpc = ["discord-rich-presence"]
 netplay = ["serde_cbor"]
@@ -70,7 +71,7 @@ byteorder = "1.4"
 clap = { version = "4.5.40", default-features = false, features = ["std", "help", "usage", "error-context", "cargo", "derive"] }
 case_insensitive_hashmap = "1.0.0"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
-cpal = { git = "https://github.com/doukutsu-rs/cpal", rev = "fe7a16f1f6610b803617a47e027c0305af3a3983" }
+cpal = { git = "https://github.com/doukutsu-rs/cpal", rev = "fe7a16f1f6610b803617a47e027c0305af3a3983", optional = true }
 directories = "3"
 discord-rich-presence = { version = "1", optional = true }
 downcast = "0.11"
